@@ -33,12 +33,34 @@ u_z = cos_theta;
 % [X,Y] = meshgrid(0:0.1:100);
 % Wand_1 = [1, 0 ,0].*X + [0, 1 ,0].*Y;
 % plot3(Wand_1)
-% P1 = [0,0,0];
-% P2 = [1,0,0];
-% P3 = [0,1,0];
-% normal = cross(P1-P2, P1-P3);
 % P = [x,y,z];
 % planefunction = dot(normal, P-P1);
+
+P1 = [0,0,0];
+P2 = [1,0,0];
+P3 = [0,1,0];
+% Ebene_1 Parameterform
+% Ebene_1 = P1 + P2.*s + P3.*t;
+% Ebene_1 Koordinatenform
+normal = cross(P1-P2, P1-P3);
+% 0 = normal(1)*x + normal(2)*y + normal(3)*z + d;
+
+%# Transform points to x,y,z
+x = [P1(1) P2(1) P3(1)];  
+y = [P1(2) P2(2) P3(2)];
+z = [P1(3) P1(3) P3(3)];
+
+%Find all coefficients of plane equation    
+A = normal(1); B = normal(2); C = normal(3);
+D = -dot(normal,P1);
+%Decide on a suitable showing range
+xLim = [-50 50];
+zLim = [-50 50];
+[X,Z] = meshgrid(xLim,zLim);
+Y = (A * X + C * Z + D)/ (-B);
+
+% --> schnittpunkt mit erster Wand nicht so sinnvoll
+
 
 %% Berechnen der Schnittpunkte mit Wand
 
