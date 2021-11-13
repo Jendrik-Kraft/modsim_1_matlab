@@ -1,0 +1,25 @@
+m = 4;
+n = 100;
+u = rand(n,1);
+cos_theta = nthroot(u,m+1);
+sin_theta = sqrt(1-cos_theta.^2);
+phi = 2*pi()*rand(n,1);
+cos_phi = cos(phi);
+sin_phi = sin(phi);
+
+u_x = sin_theta .* cos_phi;
+u_y = sin_theta .* sin_phi;
+u_z = cos_theta;
+
+p=[u_x, u_y, u_z];
+
+plot3(u_x',u_y',u_z', 'h')
+
+P0 = rand(7,3) ;
+P1 = rand(7,3) ;
+X = [P0(:,1) P1(:,1)] ;
+Y = [P0(:,2) P1(:,2)] ;
+Z = [P0(:,3) P1(:,3)] ;
+plot3(X',Y',Z')
+hold on
+plot3(X',Y',Z','.')
