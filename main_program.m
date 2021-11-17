@@ -37,8 +37,8 @@ u_z = cos_theta;
 % planefunction = dot(normal, P-P1);
 
 P1 = [0,0,0];
-P2 = [1,0,0];
-P3 = [0,1,0];
+P2 = [5,0,0];
+P3 = [0,5,0];
 % Ebene_1 Parameterform
 % Ebene_1 = P1 + P2.*s + P3.*t;
 % Ebene_1 Koordinatenform
@@ -51,7 +51,9 @@ y = [P1(2) P2(2) P3(2)];
 z = [P1(3) P1(3) P3(3)];
 
 %Find all coefficients of plane equation    
-A = normal(1); B = normal(2); C = normal(3);
+A = normal(1);
+B = normal(2);
+C = normal(3);
 D = -dot(normal,P1);
 %Decide on a suitable showing range
 xLim = [-50 50];
@@ -63,6 +65,19 @@ Y = (A * X + C * Z + D)/ (-B);
 
 
 %% Berechnen der Schnittpunkte mit Wand
+
+% stuetz_v = [0 0 0];       % letzter Schnittpunkt
+% richtungs_v = [ ];        % umrechnung vom Winkel?
+% -------------------- Notizen ----------------------------
+% g = stuetz_v + t * richtungs_v
+% Wand:
+% normal(1)*x + normal(2)*y + normal(3)*z = d
+% gleichsetzen
+% A*(stuetz_v(1)+t*richtungs_v(1))+B*(stuetz_v(2)+t*richtungs_v(2))+C*(stuetz_v(3)+t*richtungs_v(3)) = D
+% ---------------------------------------------------------
+% t = (-A*stuetz_v(1) - B*stuetz_v(2) - C*stuetz_v(3) + D) / (richtungs_v(1) + richtungs_v(2) + richtungs_v(3));
+% Schnittpunkt = stuetz_v + t * richtungs_v;
+
 
 %% Ermitteln der zuerst getroffenen Wand
 
