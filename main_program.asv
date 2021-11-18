@@ -75,9 +75,7 @@ for wand=1:6
                              Schnittpunkt(:,2,wand)<groesse+0.00001 & Schnittpunkt(:,2,wand)>=-groesse-0.00001&...
                              Schnittpunkt(:,3,wand)<groesse+0.00001 & Schnittpunkt(:,3,wand)>=-groesse-0.00001);
     %Speichern dieser Schnittpunkte
-    %TODO Checken ob schon ein Schnittpunkt für diese photon_nr eingetragen
-    %ist, wenn ja, schauen welcher der richtige ist (Winkel? Urpsrungs
-    %u_x,u_y,u_z?)
+    % TODO Checken ob schon ein Punkt eingetragen is
     richtiger_Schnittpunkt(photon_nr,:) = Schnittpunkt(photon_nr,:,wand);
 end
 %Berechnen
