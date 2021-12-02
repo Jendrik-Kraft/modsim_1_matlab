@@ -5,13 +5,15 @@
 clc;
 clear;
 close all;
-m = 1;  % Lambert Parameter
-n = 1000;  % Anzahl der gewürfelten Photonen
+m = 10;  % Lambert Parameter
+n = 100;  % Anzahl der gewürfelten Photonen
 u = rand(n,1);  % Gleichverteilte Zufallsvariable
 p = 0.6; %reflektions_wahrscheinlichkeit
 % Lambertstrahler_Startpunkt
 % Abstrahlrichtung
 
+%TODO: Potenzielles Problem: Unendlich viele Schnittpunkte bei
+%abstrahlwinkel 0% oder 180%
 %% Drehung des Lambertstrahlers
 
 %% Winkel Berechnung der Photonen
@@ -35,15 +37,6 @@ P2 = groesse*[1,0,1; 1,0,-1; 1,0,1; -1,0,0; 1,1,1; 1,-1,0;];
 P3 = groesse*[0,1,1; 0,1,-1; 1,1,1; -1,1,1; 1,1,0; 0,-1,1;];
 
 [A,B,C,D]=BerechneKoordinatenform(P1,P2,P3);
-% for n=1:6
-%         normal(:,n) = cross(P1(n,:)-P2(n,:), P1(n,:)-P3(n,:));
-%         A(n) = normal(1,n);
-%         B(n) = normal(2,n);
-%         C(n) = normal(3,n);
-%         D(n) = -dot(normal(:,n),P1(n,:));
-% end
-
-
 
 %% Berechnen der Schnittpunkte mit Wand
 stuetz_v = [0 0 0];       % letzter Schnittpunkt
@@ -56,12 +49,13 @@ richtungs_v = [u_x u_y u_z];        % umrechnung vom Winkel?
 % A*(stuetz_v(1)+t*richtungs_v(1))+B*(stuetz_v(2)+t*richtungs_v(2))+C*(stuetz_v(3)+t*richtungs_v(3)) = D
 % ---------------------------------------------------------
 Schnittpunkt=zeros(n,3,6);
-t=zeros(n);
+t=zeros(n,1);
 for pz=1:n
     for wand=1:6
         t(pz) = (-A(wand)*stuetz_v(1) - B(wand)*stuetz_v(2) - ...
-        C(wand)*stuetz_v(3) - D(wand)) / (A(wand)*richtungs_v(pz,1) + ...
-        B(wand)*richtungs_v(pz,2) + C(wand)*richtungs_v(pz,3));
+                C(wand)*stuetz_v(3) - D(wand)) / (A(wand)*richtungs_v(pz,1) + ...
+                B(wand)*richtungs_v(pz,2) + C(wand)*richtungs_v(pz,3));
+    
         Schnittpunkt(pz,:,wand) = stuetz_v + t(pz)*richtungs_v(pz,:);
     end
 end
@@ -71,31 +65,68 @@ richtiger_Schnittpunkt=zeros(n,3);
 for wand=1:6
     %Ermitteln aller Schnittpunkte die alle Koordinaten innerhalb der Raums
     %haben
+    
+    % TODO Klären warum +0.00001 nötig ist
+    entfernungen = sqrt((Schnittpunkt(:,1,:)-stuetz_v(1)).^2+...
+                        (Schnittpunkt(:,2,:)-stuetz_v(2)).^2+...
+                        (Schnittpunkt(:,3,:)-stuetz_v(3)).^2);
+
     photon_nr=find(Schnittpunkt(:,1,wand)<groesse+0.00001 & Schnittpunkt(:,1,wand)>=-groesse-0.00001&...
                              Schnittpunkt(:,2,wand)<groesse+0.00001 & Schnittpunkt(:,2,wand)>=-groesse-0.00001&...
                              Schnittpunkt(:,3,wand)<groesse+0.00001 & Schnittpunkt(:,3,wand)>=-groesse-0.00001);
-    %Speichern dieser Schnittpunkte
-    %TODO Checken ob schon ein Schnittpunkt für diese photon_nr eingetragen
-    %ist, wenn ja, schauen welcher der richtige ist (Winkel? Urpsrungs
-    %u_x,u_y,u_z?)
-    richtiger_Schnittpunkt(photon_nr,:) = Schnittpunkt(photon_nr,:,wand);
-end
-%Berechnen
-entfernungen = sqrt((Schnittpunkt(:,1,:)-stuetz_v(1)).^2+(Schnittpunkt(:,2,:)-stuetz_v(2)).^2+(Schnittpunkt(:,3,:)-stuetz_v(3)).^2);
-%kleinste_entf = min(
-%% Überleben oder verschwinden des Photons ermitteln
-ueberlebens_matrix = ceil(rand(n,1)-p); % 0 für <= p, 1 für > p
+                             %entfernungen(:,wand)>0);
+    %Speichern dieser Schnittpunkte, ermitteln ob schon ein Schnittpunkt
+    %eingetragen ist und wenn das der Fall ist, ermitteln welche Wand näher
+    %am ursprünglich ausgewürfelten Punkt liegt - und damit die richitge
+    %ist
+    for i=1:length(photon_nr)
+        if richtiger_Schnittpunkt(photon_nr,1) ~= 0
+            laenge_1=sqrt((Schnittpunkt(photon_nr,1,wand)-u_x(photon_nr)).^2+...
+                (Schnittpunkt(photon_nr,2,wand)-u_y(photon_nr)).^2+...
+                (Schnittpunkt(photon_nr,3,wand)-u_z(photon_nr)).^2);
+            laenge_2=sqrt((richtiger_Schnittpunkt(photon_nr,1)-u_x(photon_nr)).^2+...
+                (richtiger_Schnittpunkt(photon_nr,2)-u_y(photon_nr)).^2+...
+                (richtiger_Schnittpunkt(photon_nr,3)-u_z(photon_nr)).^2);
+        
+        
+            if laenge_1(i) < laenge_2(i)
+                richtiger_Schnittpunkt(photon_nr(i),:) = Schnittpunkt(photon_nr(i),:,wand);
+            end
 
-%% Ausrechnen des nächsten Abstrahlvektors... -> Schleife
+        else
+            richtiger_Schnittpunkt(photon_nr,:) = Schnittpunkt(photon_nr,:,wand);
+        end
+    end
+end
 
 %% Plotten des Photonenwegs
-X = [zeros(n,1,6) Schnittpunkt(:,1,:)] ;
-Y = [zeros(n,1,6) Schnittpunkt(:,2,:)] ;
-Z = [zeros(n,1,6) Schnittpunkt(:,3,:)] ;
+X = [zeros(n,1) richtiger_Schnittpunkt(:,1)] ;
+Y = [zeros(n,1) richtiger_Schnittpunkt(:,2)] ;
+Z = [zeros(n,1) richtiger_Schnittpunkt(:,3)] ;
 
 figure(1)
-plot3(X(:,:,3)',Y(:,:,3)',Z(:,:,3)')
+plot3(X(:,:)',Y(:,:)',Z(:,:)')
 hold on
-plot3(X(:,:,3)',Y(:,:,3)',Z(:,:,3)','.')
+plot3(X(:,:)',Y(:,:)',Z(:,:)','.')
 hold on
 grid on
+
+
+%% Überleben oder verschwinden des Photons ermitteln
+ueberlebens_matrix = ceil(rand(n,1)-p); % 0 für <= p, 1 für > p
+richtiger_Schnittpunkt=richtiger_Schnittpunkt(ueberlebens_matrix~=0);
+%% Ausrechnen des nächsten Abstrahlvektors... -> Schleife
+
+%% Drehmatrix
+%Neues auswürfeln von x,y,z...
+gewuerfelte_richtung=[u_x,u_y,u_z];
+a=pi/2;
+drehmatrix_x=[1,      0,       0;
+              0, cos(a), -sin(a);
+              0, sin(a), cos(a)];
+i=1:n;
+matrix = drehmatrix_x*gewuerfelte_richtung(i,:)';
+u_x=matrix(1,:)';
+u_y=matrix(2,:)';
+u_z=matrix(3,:)';
+
