@@ -114,7 +114,7 @@ grid on
 
 %% Überleben oder verschwinden des Photons ermitteln
 ueberlebens_matrix = ceil(rand(n,1)-p); % 0 für <= p, 1 für > p
-richtiger_Schnittpunkt=richtiger_Schnittpunkt(ueberlebens_matrix~=0);
+%richtiger_Schnittpunkt=richtiger_Schnittpunkt(ueberlebens_matrix~=0);
 %% Ausrechnen des nächsten Abstrahlvektors... -> Schleife
 
 %% Drehmatrix
