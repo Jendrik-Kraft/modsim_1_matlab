@@ -5,7 +5,7 @@
 clc;
 clear;
 close all;
-m = 10;  % Lambert Parameter
+m = 3;  % Lambert Parameter
 n = 100;  % Anzahl der gewürfelten Photonen
 u = rand(n,1);  % Gleichverteilte Zufallsvariable
 p = 0.6; %reflektions_wahrscheinlichkeit
@@ -16,17 +16,8 @@ p = 0.6; %reflektions_wahrscheinlichkeit
 %abstrahlwinkel 0% oder 180%
 %% Drehung des Lambertstrahlers
 
-%% Winkel Berechnung der Photonen
-cos_theta = nthroot(u,m+1); 
-sin_theta = sqrt(1-cos_theta.^2);
-phi = 2*pi()*rand(n,1);
-cos_phi = cos(phi);
-sin_phi = sin(phi);
-
-%% Vektor Berechnung der Photonen
-u_x = sin_theta .* cos_phi;
-u_y = sin_theta .* sin_phi;
-u_z = cos_theta;
+%% Berechnung der zufälligen Richtungsvektoren der Photonen
+[u_x, u_y, u_z] = BerechneZufaelligeRichtungsvektoren(n,m,pi()/2,pi()/2);
 
 
 %% Wand Matrizen Definition
@@ -99,34 +90,44 @@ for wand=1:6
     end
 end
 
+alle_schnittpunkte = richtiger_Schnittpunkt;
+% Zum anhängen: alle_schnittpunkte =
+% [alle_schnittpunkte;richtiger_Schnittpunkt];
 %% Plotten des Photonenwegs
 X = [zeros(n,1) richtiger_Schnittpunkt(:,1)] ;
 Y = [zeros(n,1) richtiger_Schnittpunkt(:,2)] ;
 Z = [zeros(n,1) richtiger_Schnittpunkt(:,3)] ;
 
 figure(1)
+
 plot3(X(:,:)',Y(:,:)',Z(:,:)')
 hold on
 plot3(X(:,:)',Y(:,:)',Z(:,:)','.')
+xlim([-5,5])
+ylim([-5,5])
+zlim([-5,5])
 hold on
 grid on
 
 
 %% Überleben oder verschwinden des Photons ermitteln
+k = 1:1:n;
 ueberlebens_matrix = ceil(rand(n,1)-p); % 0 für <= p, 1 für > p
-%richtiger_Schnittpunkt=richtiger_Schnittpunkt(ueberlebens_matrix~=0);
+neue_startpunkte=richtiger_Schnittpunkt(ueberlebens_matrix(k)~=0, :, :);
+
 %% Ausrechnen des nächsten Abstrahlvektors... -> Schleife
+
 
 %% Drehmatrix
 %Neues auswürfeln von x,y,z...
-gewuerfelte_richtung=[u_x,u_y,u_z];
-a=pi/2;
-drehmatrix_x=[1,      0,       0;
-              0, cos(a), -sin(a);
-              0, sin(a), cos(a)];
-i=1:n;
-matrix = drehmatrix_x*gewuerfelte_richtung(i,:)';
-u_x=matrix(1,:)';
-u_y=matrix(2,:)';
-u_z=matrix(3,:)';
+% gewuerfelte_richtung=[u_x,u_y,u_z];
+% a=pi/2;
+% drehmatrix_x=[1,      0,       0;
+%               0, cos(a), -sin(a);
+%               0, sin(a), cos(a)];
+% i=1:n;
+% matrix = drehmatrix_x*gewuerfelte_richtung(i,:)';
+% u_x=matrix(1,:)';
+% u_y=matrix(2,:)';
+% u_z=matrix(3,:)';
 
