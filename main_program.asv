@@ -9,7 +9,7 @@ m = 3;  % Lambert Parameter
 n = 100;  % Anzahl der gewürfelten Photonen
 u = rand(n,1);  % Gleichverteilte Zufallsvariable
 p = 0.6; %reflektions_wahrscheinlichkeit
-Lichtquelle = [0,0,-5];
+Lichtquelle = [5,0,0];
 groesse = 5;
 % Lambertstrahler_Startpunkt
 % Abstrahlrichtung
@@ -19,8 +19,7 @@ groesse = 5;
 %% Drehung des Lambertstrahlers
 
 %% Berechnung der zufälligen Richtungsvektoren der Photonen
-% TODO warum schickt ein Startpunkt von 5 und -5 in die gleiche Richtung?
-[u_x, u_y, u_z] = BerechneZufaelligeRichtungsvektoren(n,m,Lichtquelle,groesse);
+[u_x, u_y, u_z] = BerechneZufaelligeRichtungsvektoren(n,m,Lichtquelle, groesse);
 
 
 %% Wand Matrizen Definition
