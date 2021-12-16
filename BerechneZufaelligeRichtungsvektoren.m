@@ -32,15 +32,15 @@ function [u_x, u_y, u_z] = BerechneZufaelligeRichtungsvektoren(n, m, Schnittpunk
         if Schnittpunkt(1) >= groesse
             %Wenn die Wand bei x = 5 getroffen wurde muss um die y-Achse
             %gedreht werden, weil diese Wand parallel zur y-Achse liegt
-            drehmatrix = BerechneDrehmatrix(pi/2,2);
-        else
             drehmatrix = BerechneDrehmatrix(-pi/2,2);
+        else
+            drehmatrix = BerechneDrehmatrix(pi/2,2);
         end
     elseif abs(Schnittpunkt(2)) > groesse
         if Schnittpunkt(2) >= groesse
-            drehmatrix = BerechneDrehmatrix(pi/2,1);
-        else
             drehmatrix = BerechneDrehmatrix(-pi/2,1);
+        else
+            drehmatrix = BerechneDrehmatrix(pi/2,1);
         end
     elseif abs(Schnittpunkt(3)) > groesse
         if Schnittpunkt(3) >= groesse
@@ -55,9 +55,6 @@ function [u_x, u_y, u_z] = BerechneZufaelligeRichtungsvektoren(n, m, Schnittpunk
     else error = error+1
     end
 
-    
-    
-       
     i=1:n;
     gewuerfelte_richtung=[u_x,u_y,u_z]';
     matrix = drehmatrix*gewuerfelte_richtung(:,i);
