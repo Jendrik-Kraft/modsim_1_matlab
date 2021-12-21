@@ -5,10 +5,10 @@
 clc;
 clear;
 close all;
-m = 7;  % Lambert Parameter
-n = 7;  % Anzahl der gewürfelten Photonen
+m = 1;  % Lambert Parameter
+n = 1000;  % Anzahl der gewürfelten Photonen
 u = rand(n,1);  % Gleichverteilte Zufallsvariable
-p = 0.7; %reflektions_wahrscheinlichkeit
+p = 0.1; %reflektions_wahrscheinlichkeit
 Lichtquelle = [0,0,0];
 groesse = 5;
 % Lambertstrahler_Startpunkt
@@ -35,14 +35,14 @@ P3 = groesse*[0,1,1; 0,1,-1; 1,1,1; -1,1,1; 1,1,0; 0,-1,1;];
 stuetz_v = [0 0 0];       % letzter Schnittpunkt
 richtungs_v = [u_x u_y u_z];        % umrechnung vom Winkel?
 % TODO Bschreiben was die Funktion tut..
-richtiger_Schnittpunkt = BerechneSchnittpunkt(stuetz_v, richtungs_v, A, B, C, D, n, groesse);
-alle_schnittpunkte = richtiger_Schnittpunkt;
+schnittpunkt = BerechneSchnittpunkt(stuetz_v, richtungs_v, A, B, C, D, n, groesse);
+alle_schnittpunkte = schnittpunkt;
 % Zum anhängen: alle_schnittpunkte =
-% [alle_schnittpunkte;richtiger_Schnittpunkt];
+% [alle_schnittpunkte;Schnittpunkt];
 %% Plotten des Photonenwegs
-X = [zeros(n,1) richtiger_Schnittpunkt(:,1)] ;
-Y = [zeros(n,1) richtiger_Schnittpunkt(:,2)] ;
-Z = [zeros(n,1) richtiger_Schnittpunkt(:,3)] ;
+X = [zeros(n,1) schnittpunkt(:,1)] ;
+Y = [zeros(n,1) schnittpunkt(:,2)] ;
+Z = [zeros(n,1) schnittpunkt(:,3)] ;
 
 
 
@@ -50,14 +50,13 @@ Z = [zeros(n,1) richtiger_Schnittpunkt(:,3)] ;
 %% Überleben oder verschwinden des Photons ermitteln
 k = 1:1:n;
 ueberlebens_matrix = ceil(rand(n,1)-(1-p));
-%neue_startpunkte=richtiger_Schnittpunkt(ueberlebens_matrix(k)~=0, :, :);
-neue_startpunkte=richtiger_Schnittpunkt;
+startpunkte=schnittpunkt;
 
 %% Ausrechnen des nächsten Abstrahlvektors... -> Schleife
-u_x= zeros(1,length(neue_startpunkte));
-u_y= zeros(1,length(neue_startpunkte));
-u_z= zeros(1,length(neue_startpunkte));
-naechster_schnittpunkte=zeros(length(n),3);
+u_x= zeros(1,length(startpunkte));
+u_y= zeros(1,length(startpunkte));
+u_z= zeros(1,length(startpunkte));
+naechster_schnittpunkt=zeros(length(n),3);
 
 loops=2;
 photonen = n;
@@ -66,47 +65,104 @@ while photonen > 0
     for x=1:n
         if ueberlebens_matrix(x)==1
 
-            [u_x(x),u_y(x),u_z(x)] = BerechneZufaelligeRichtungsvektoren(1,1,neue_startpunkte(x,:),groesse);
-            stuetz_v = neue_startpunkte(x,:);
+            [u_x(x),u_y(x),u_z(x)] = BerechneZufaelligeRichtungsvektoren(1,1,startpunkte(x,:),groesse);
+            stuetz_v = startpunkte(x,:);
             richtungs_v = [u_x(x) u_y(x) u_z(x)];
-            naechster_schnittpunkte(x,:) = BerechneSchnittpunkt(stuetz_v, richtungs_v, A, B, C, D, 1, groesse);
+            naechster_schnittpunkt(x,:) = BerechneSchnittpunkt(stuetz_v, richtungs_v, A, B, C, D, 1, groesse);
 
 
         else
-            naechster_schnittpunkte(x,:)=nan(1,3);
-            photonen = photonen -1
+            naechster_schnittpunkt(x,:)=nan(1,3);
+            photonen = photonen -1;
         end
-        X(x,loops) = naechster_schnittpunkte(x,1);
-        Y(x,loops) = naechster_schnittpunkte(x,2);
-        Z(x,loops) = naechster_schnittpunkte(x,3);
+        X(x,loops) = naechster_schnittpunkt(x,1);
+        Y(x,loops) = naechster_schnittpunkt(x,2);
+        Z(x,loops) = naechster_schnittpunkt(x,3);
         
     end
     ueberlebens_matrix = ceil(rand(n,1)-(1-p)).*ueberlebens_matrix;
-%     k=1:size(neue_startpunkte,1);
-%     ueberlebens_matrix = ceil(rand(size(neue_startpunkte,1),1)-(1-p));
-    neue_startpunkte=naechster_schnittpunkte;
+    startpunkte=naechster_schnittpunkt;
+    alle_schnittpunkte =[alle_schnittpunkte;rmmissing(naechster_schnittpunkt)];
 end
-figure(1)
 
-plot3(X(:,:)',Y(:,:)',Z(:,:)')
-hold on
-plot3(X(:,:)',Y(:,:)',Z(:,:)')%,'.')
-xlim([-5,5])
-ylim([-5,5])
-zlim([-5,5])
-hold on
-grid on
+%% Zeichnen der heatmap für jede Wand
 
-%% Drehmatrix
-%Neues auswürfeln von x,y,z...
-% gewuerfelte_richtung=[u_x,u_y,u_z];
-% a=pi/2;
-% drehmatrix_x=[1,      0,       0;
-%               0, cos(a), -sin(a);
-%               0, sin(a), cos(a)];
-% i=1:n;
-% matrix = drehmatrix_x*gewuerfelte_richtung(i,:)';
-% u_x=matrix(1,:)';
-% u_y=matrix(2,:)';
-% u_z=matrix(3,:)';
+oben = alle_schnittpunkte(find(alle_schnittpunkte(:,3)>=groesse-0.000001),:);
+unten = alle_schnittpunkte(find(alle_schnittpunkte(:,3)<=-groesse+0.000001),:);
+
+links = alle_schnittpunkte(find(alle_schnittpunkte(:,2)>=groesse-0.000001),:);
+rechts = alle_schnittpunkte(find(alle_schnittpunkte(:,2)<=-groesse+0.000001),:);
+
+vorne = alle_schnittpunkte(find(alle_schnittpunkte(:,1)>=groesse-0.000001),:);
+hinten = alle_schnittpunkte(find(alle_schnittpunkte(:,1)<=-groesse+0.000001),:);
+
+oben = [oben(:,1), oben(:,2)];
+unten = [unten(:,1), unten(:,2)];
+links = [links(:,1), links(:,3)];
+rechts = [rechts(:,1), rechts(:,3)];
+vorne = [vorne(:,2), vorne(:,3)];
+hinten = [hinten(:,2), hinten(:,3)];
+
+xgrid = -groesse:0.5:groesse;
+ygrid = -groesse:0.5:groesse;
+
+figure
+subplot(3,5,3)
+N = hist3(oben, {xgrid, ygrid});
+handler(1) = pcolor(xgrid, ygrid, N');
+max_N(1) = max(max(N));
+% colorbar
+title("Oben")
+
+subplot(3,5,13)
+N = hist3(unten, {xgrid, ygrid});
+handler(2) =pcolor(xgrid, ygrid, N');
+max_N(2) = max(max(N));
+% colorbar
+title("Unten")
+
+subplot(3,5,6)
+N = hist3(links, {xgrid, ygrid});
+handler(3) = pcolor(xgrid, ygrid, N');
+max_N(3) = max(max(N));
+% colorbar
+title("Links")
+
+subplot(3,5,9)
+N = hist3(rechts, {xgrid, ygrid});
+handler(4) = pcolor(xgrid, ygrid, N');
+max_N(4) = max(max(N));
+% colorbar
+title("Rechts")
+
+subplot(3,5,7)
+N = hist3(vorne, {xgrid, ygrid});
+handler(5) = pcolor(xgrid, ygrid, N');
+max_N(5) = max(max(N));
+% colorbar
+title("Vorne")
+
+subplot(3,5,10)
+N = hist3(hinten, {xgrid, ygrid});
+handler(6) = pcolor(xgrid, ygrid, N');
+max_N(6) = max(max(N));
+% colorbar
+title("Hinten")
+max_graphik = find(max_N == max(max_N))
+colorbar('Position', [0.93  0.05  0.03  0.9], 'Parent', handler(max_graphik))
+
+
+% figure(1)
+% 
+% plot3(X(:,:)',Y(:,:)',Z(:,:)')
+% hold on
+% plot3(X(:,:)',Y(:,:)',Z(:,:)')%,'.')
+% groesse = groesse +3;
+% xlim([-groesse,groesse])
+% ylim([-groesse,groesse])
+% zlim([-groesse,groesse])
+% hold on
+% grid on
+
+
 

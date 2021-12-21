@@ -15,22 +15,12 @@ function [u_x, u_y, u_z] = BerechneZufaelligeRichtungsvektoren(n, m, Schnittpunk
     u_x = sin_theta .* cos_phi;
     u_y = sin_theta .* sin_phi;
     u_z = cos_theta;
-
-%     R_x = [1, 0     ,       0;
-%            0, cos(a), -sin(a);
-%            0, sin(a),  cos(a);];
-% 
-%     R_y = [cos(a),  0,  sin(a);
-%            0,       1,       0;
-%            -sin(a), 0,  cos(a);];
-%        
-%     R_z = [cos(a), -sin(a), 0;
-%            sin(a),  cos(a), 0;
-%            0,            0, 1;];
     
+    
+    %% Bestimmen der richtigen Drehmatrix abhängig von der getroffenen Wand
     if abs(Schnittpunkt(1)) > groesse
         if Schnittpunkt(1) >= groesse
-            %Wenn die Wand bei x = 5 getroffen wurde muss um die y-Achse
+            %Wenn die Wand bei x = groesse getroffen wurde muss um die y-Achse
             %gedreht werden, weil diese Wand parallel zur y-Achse liegt
             drehmatrix = BerechneDrehmatrix(-pi/2,2);
         else
@@ -52,9 +42,10 @@ function [u_x, u_y, u_z] = BerechneZufaelligeRichtungsvektoren(n, m, Schnittpunk
         end
     elseif Schnittpunkt(1) == 0 && Schnittpunkt(2) == 0 && Schnittpunkt(3) == 0
         drehmatrix = BerechneDrehmatrix(2*pi,1); 
-    else error = error+1
+    else error = error+1 % Passiert hoffentlich nie :)
     end
 
+    %% Drehen des Richtungsvektors mit der bestimmten Drehmatrix
     i=1:n;
     gewuerfelte_richtung=[u_x,u_y,u_z]';
     matrix = drehmatrix*gewuerfelte_richtung(:,i);
