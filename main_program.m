@@ -60,22 +60,22 @@ loops=2;
 photonen = n;
 while photonen > 0
     loops=loops+1;
-    for x=1:n
-        if ueberlebens_matrix(x)==1
+    for i=1:n
+        if ueberlebens_matrix(i)==1
 
-            [u_x(x),u_y(x),u_z(x)] = BerechneZufaelligeRichtungsvektoren(1,1,startpunkte(x,:),groesse);
-            stuetz_v = startpunkte(x,:);
-            richtungs_v = [u_x(x) u_y(x) u_z(x)];
-            naechster_schnittpunkt(x,:) = BerechneSchnittpunkt(stuetz_v, richtungs_v, A, B, C, D, 1, groesse);
+            [u_x(i),u_y(i),u_z(i)] = BerechneZufaelligeRichtungsvektoren(1,1,startpunkte(i,:),groesse);
+            stuetz_v = startpunkte(i,:);
+            richtungs_v = [u_x(i) u_y(i) u_z(i)];
+            naechster_schnittpunkt(i,:) = BerechneSchnittpunkt(stuetz_v, richtungs_v, A, B, C, D, 1, groesse);
 
 
         else
-            naechster_schnittpunkt(x,:)=nan(1,3);
+            naechster_schnittpunkt(i,:)=nan(1,3);
             photonen = photonen -1;
         end
-        X(x,loops) = naechster_schnittpunkt(x,1);
-        Y(x,loops) = naechster_schnittpunkt(x,2);
-        Z(x,loops) = naechster_schnittpunkt(x,3);
+        X(i,loops) = naechster_schnittpunkt(i,1);
+        Y(i,loops) = naechster_schnittpunkt(i,2);
+        Z(i,loops) = naechster_schnittpunkt(i,3);
         
     end
     ueberlebens_matrix = ceil(rand(n,1)-(1-p)).*ueberlebens_matrix;
