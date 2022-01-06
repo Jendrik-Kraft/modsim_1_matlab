@@ -5,21 +5,19 @@
 clc;
 clear;
 close all;
-m = 1;  % Lambert Parameter
-n = 1000;  % Anzahl der gewürfelten Photonen
+m = 100;  % Lambert Parameter
+n = 10000;  % Anzahl der gewürfelten Photonen
 u = rand(n,1);  % Gleichverteilte Zufallsvariable
-p = 0.1; %reflektions_wahrscheinlichkeit
-Lichtquelle = [0,0,0];
-groesse = 5;
-% Lambertstrahler_Startpunkt
-% Abstrahlrichtung
+p = 0.8; % Reflektionswahrscheinlichkeit
+Lichtquelle = [-5,0,0]; % Lambertstrahler Startpunkt
+groesse = 5; % Abstand der Wände vom Ursprung
+% TODO Abstrahlrichtung implementieren
 
 %TODO: Potenzielles Problem: Unendlich viele Schnittpunkte bei
 %abstrahlwinkel 0% oder 180%
 %% Drehung des Lambertstrahlers
 
 %% Berechnung der zufälligen Richtungsvektoren der Photonen
-% TODO warum schickt ein Startpunkt von 5 und -5 in die gleiche Richtung?
 [u_x, u_y, u_z] = BerechneZufaelligeRichtungsvektoren(n,m,Lichtquelle,groesse);
 
 
@@ -103,66 +101,88 @@ rechts = [rechts(:,1), rechts(:,3)];
 vorne = [vorne(:,2), vorne(:,3)];
 hinten = [hinten(:,2), hinten(:,3)];
 
-xgrid = -groesse:0.5:groesse;
-ygrid = -groesse:0.5:groesse;
+xgrid = -groesse:groesse/20:groesse;
+ygrid = -groesse:groesse/20:groesse;
 
 figure
-subplot(3,5,3)
+subplot(3,4,2)
 N = hist3(oben, {xgrid, ygrid});
 handler(1) = pcolor(xgrid, ygrid, N');
 max_N(1) = max(max(N));
-% colorbar
+colorbar
+caxis([0 20])
 title("Oben")
+subtitle("Maximale Photonenzahl: " + max_N(1))
 
-subplot(3,5,13)
+subplot(3,4,10)
 N = hist3(unten, {xgrid, ygrid});
 handler(2) =pcolor(xgrid, ygrid, N');
 max_N(2) = max(max(N));
-% colorbar
+colorbar
+caxis([0 20])
 title("Unten")
+subtitle("Maximale Photonenzahl: " + max_N(2))
 
-subplot(3,5,6)
+subplot(3,4,5)
 N = hist3(links, {xgrid, ygrid});
 handler(3) = pcolor(xgrid, ygrid, N');
 max_N(3) = max(max(N));
-% colorbar
+colorbar
+caxis([0 20])
 title("Links")
+subtitle("Maximale Photonenzahl: " + max_N(3))
 
-subplot(3,5,9)
+subplot(3,4,7)
 N = hist3(rechts, {xgrid, ygrid});
 handler(4) = pcolor(xgrid, ygrid, N');
 max_N(4) = max(max(N));
-% colorbar
+colorbar
+caxis([0 20])
 title("Rechts")
+subtitle("Maximale Photonenzahl: " + max_N(4))
 
-subplot(3,5,7)
+subplot(3,4,6)
 N = hist3(vorne, {xgrid, ygrid});
 handler(5) = pcolor(xgrid, ygrid, N');
 max_N(5) = max(max(N));
-% colorbar
+colorbar
+caxis([0 60])
 title("Vorne")
+subtitle("Maximale Photonenzahl: " + max_N(5))
 
-subplot(3,5,10)
+subplot(3,4,8)
 N = hist3(hinten, {xgrid, ygrid});
 handler(6) = pcolor(xgrid, ygrid, N');
 max_N(6) = max(max(N));
-% colorbar
+colorbar
+caxis([0 20])
 title("Hinten")
-max_graphik = find(max_N == max(max_N))
-colorbar('Position', [0.93  0.05  0.03  0.9], 'Parent', handler(max_graphik))
+subtitle("Maximale Photonenzahl: " + max_N(6))
+%max_graphik = find(max_N == max(max_N))
+%colorbar('Position', [0.93  0.05  0.03  0.9], 'Parent', handler(max_graphik))
+sgtitle("Heatmap von 10000 Photonen, Reflektionsfaktor: "+p+"; Lambert-Parameter: "+m+"; Raumgröße: "+groesse) 
+annotation('textbox',[.7 .7 .1 .2], ...
+'String','Achtung: Verschiedene Skalen!','Color','red', 'EdgeColor','none')
 
+figure(2)
+stichprobe=1:20;
+plot3(X(stichprobe,:)',Y(stichprobe,:)',Z(stichprobe,:)')
+hold on
+plot3(X(stichprobe,:)',Y(stichprobe,:)',Z(stichprobe,:)')%,'.')
+plot_groesse = groesse +3;
+xlim([-plot_groesse,plot_groesse])
+ylim([-plot_groesse,plot_groesse])
+zlim([-plot_groesse,plot_groesse])
+hold on
+grid on
+title("Path Tracing von 20 Photonen, Reflektionsfaktor: "+p+"; Lambert-Parameter: "+m+"; Raumgröße: "+groesse) 
+xlabel("x")
+ylabel("y")
+zlabel("z")
 
-% figure(1)
-% 
-% plot3(X(:,:)',Y(:,:)',Z(:,:)')
-% hold on
-% plot3(X(:,:)',Y(:,:)',Z(:,:)')%,'.')
-% groesse = groesse +3;
-% xlim([-groesse,groesse])
-% ylim([-groesse,groesse])
-% zlim([-groesse,groesse])
-% hold on
-% grid on
+%  Raumgröße: 1, 5, 10
+% 1. m variieren 1, 5, 100
+% 2. Reflektionsfaktor 0,8 (weiß) 0,3 (mittelgrau) 0,125 (dunkle eiche)
 
 
 

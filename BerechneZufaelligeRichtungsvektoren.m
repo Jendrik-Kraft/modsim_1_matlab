@@ -2,7 +2,9 @@ function [u_x, u_y, u_z] = BerechneZufaelligeRichtungsvektoren(n, m, Schnittpunk
     %% Winkel Berechnung der Photonen
     groesse = groesse - 0.000001; % NOTWENDIG FÜR RUNDUNGSFEHLER
     error=0;
+    
     %TODO SONDERFALL >1 WERT == 5 (ECKE/KANTE Getroffen)
+    
     u = rand(n,1);  % Gleichverteilte Zufallsvariable
     cos_theta = nthroot(u,m+1);
     sin_theta = sqrt(1-cos_theta.^2);
@@ -28,9 +30,9 @@ function [u_x, u_y, u_z] = BerechneZufaelligeRichtungsvektoren(n, m, Schnittpunk
         end
     elseif abs(Schnittpunkt(2)) > groesse
         if Schnittpunkt(2) >= groesse
-            drehmatrix = BerechneDrehmatrix(-pi/2,1);
-        else
             drehmatrix = BerechneDrehmatrix(pi/2,1);
+        else
+            drehmatrix = BerechneDrehmatrix(-pi/2,1);
         end
     elseif abs(Schnittpunkt(3)) > groesse
         if Schnittpunkt(3) >= groesse
@@ -48,10 +50,10 @@ function [u_x, u_y, u_z] = BerechneZufaelligeRichtungsvektoren(n, m, Schnittpunk
     %% Drehen des Richtungsvektors mit der bestimmten Drehmatrix
     i=1:n;
     gewuerfelte_richtung=[u_x,u_y,u_z]';
-    matrix = drehmatrix*gewuerfelte_richtung(:,i);
-    u_x=matrix(1,:)';
-    u_y=matrix(2,:)';
-    u_z=matrix(3,:)';
+    richtungsvektor = drehmatrix*gewuerfelte_richtung(:,i);
+    u_x=richtungsvektor(1,:)';
+    u_y=richtungsvektor(2,:)';
+    u_z=richtungsvektor(3,:)';
     
 %     %% Drehen der Vektoren um die angegebenen Winkel a und b
 %     drehmatrix=[cos(a)*cos(b),-sin(b),sin(a)*cos(b);
