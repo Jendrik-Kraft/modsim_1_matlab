@@ -79,6 +79,7 @@ while photonen > 0
         
     end
     ueberlebens_matrix = ceil(rand(n,1)-(1-p)).*ueberlebens_matrix;
+    % so stimmt die Wahrscheinlichkeit nicht mehr!
     startpunkte=naechster_schnittpunkt;
     alle_schnittpunkte =[alle_schnittpunkte;rmmissing(naechster_schnittpunkt)];
 end
