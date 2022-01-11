@@ -5,7 +5,7 @@
 clc;
 clear;
 close all;
-m = 100;  % Lambert Parameter
+m = 1;  % Lambert Parameter
 n = 10000;  % Anzahl der gewürfelten Photonen
 u = rand(n,1);  % Gleichverteilte Zufallsvariable
 p = 0.8; % Reflektionswahrscheinlichkeit
